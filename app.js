@@ -1,6 +1,3 @@
-// Judging System Application JavaScript
-
-// Make functions globally available immediately
 window.showLoginModal = showLoginModal;
 window.hideLoginModal = hideLoginModal;
 window.showAddJudgeModal = showAddJudgeModal;
@@ -16,7 +13,6 @@ window.resetAllData = resetAllData;
 window.backToAdmin = backToAdmin;
 window.backToDashboard = backToDashboard;
 window.logout = logout;
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyDAYFBfgOTIEq4Jv2ZgXXcFouAXixp5i-Y",
@@ -763,7 +759,7 @@ async function loadLeaderboard() {
                     <thead>
                         <tr>
                             <th>Rank</th>
-                            <th>Team Name</th>
+                            <th>Team ID</th>
                             <th>Final Score</th>
                         </tr>
                     </thead>
@@ -777,7 +773,7 @@ async function loadLeaderboard() {
                 tableHTML += `
                     <tr>
                         <td><span class="rank-badge ${rankClass}">${rank}</span></td>
-                        <td>${data.teamName}</td>
+                        <td>${data.id || data.teamId}</td>
                         <td>${data.finalScore.toFixed(2)}</td>
                     </tr>
                 `;
@@ -798,8 +794,9 @@ async function downloadLeaderboardCSV() {
         
         if (db) {
             const leaderboardSnapshot = await db.collection('leaderboard').orderBy('finalScore', 'desc').get();
+            // Correctly fetch the document ID along with the data
             leaderboardSnapshot.forEach(doc => {
-                leaderboardData.push(doc.data());
+                leaderboardData.push({ id: doc.id, ...doc.data() });
             });
         } else {
             leaderboardData = [...localData.leaderboard].sort((a, b) => b.finalScore - a.finalScore);
@@ -810,11 +807,12 @@ async function downloadLeaderboardCSV() {
             return;
         }
         
-        let csvContent = 'Rank,Team Name,Final Score\n';
+        let csvContent = 'Rank,Team ID,Final Score\n';
         
         leaderboardData.forEach((data, index) => {
             const rank = index + 1;
-            csvContent += `${rank},${data.teamName},${data.finalScore.toFixed(2)}\n`;
+            const teamId = data.id || data.teamId;
+            csvContent += `${rank},${teamId},${data.finalScore.toFixed(2)}\n`;
         });
         
         const blob = new Blob([csvContent], { type: 'text/csv' });
