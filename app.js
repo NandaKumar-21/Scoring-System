@@ -5,6 +5,9 @@ window.showLoginModal = showLoginModal;
 window.hideLoginModal = hideLoginModal;
 window.showAddJudgeModal = showAddJudgeModal;
 window.hideAddJudgeModal = hideAddJudgeModal;
+window.showAddTeamModal = showAddTeamModal;
+window.hideAddTeamModal = hideAddTeamModal;
+window.removeTeam = removeTeam;
 window.updateJudgePassword = updateJudgePassword;
 window.removeJudge = removeJudge;
 window.showLeaderboard = showLeaderboard;
@@ -13,6 +16,7 @@ window.resetAllData = resetAllData;
 window.backToAdmin = backToAdmin;
 window.backToDashboard = backToDashboard;
 window.logout = logout;
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyDAYFBfgOTIEq4Jv2ZgXXcFouAXixp5i-Y",
@@ -23,6 +27,7 @@ const firebaseConfig = {
   appId: "1:1056263661432:web:885eec66405b21f9358a8d"
 };
 
+// Global State
 let currentUser = null;
 let currentUserType = null;
 let currentTeam = null;
@@ -461,6 +466,9 @@ async function loadTeamsList() {
                     <div class="team-info">
                         <strong>${team.name}</strong> (${team.id})
                     </div>
+                    <div class="judge-actions-small">
+                        <button class="btn btn--small" style="background: #E74C3C; color: white;" onclick="removeTeam('${team.id}', '${team.name}')">Remove</button>
+                    </div>
                 `;
                 
                 teamsList.appendChild(teamItem);
@@ -583,53 +591,90 @@ async function removeJudge(judgeId, judgeName) {
 }
 
 // Team Management Functions
-async function handleTeamUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+function showAddTeamModal() {
+    const modal = document.getElementById('add-team-modal');
+    const idInput = document.getElementById('team-id-input');
     
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-        try {
-            const teams = JSON.parse(event.target.result);
-            if (!Array.isArray(teams)) {
-                showToast('Invalid JSON format. Expected an array of teams.', 'error');
-                return;
+    if (modal) {
+        modal.classList.remove('hidden');
+        if (idInput) {
+            setTimeout(() => idInput.focus(), 100);
+        }
+    }
+}
+
+function hideAddTeamModal() {
+    const modal = document.getElementById('add-team-modal');
+    const form = document.getElementById('add-team-form');
+    
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    if (form) {
+        form.reset();
+    }
+}
+
+async function handleAddTeam(e) {
+    e.preventDefault();
+    
+    const id = document.getElementById('team-id-input').value.trim();
+    const name = document.getElementById('team-name-input').value.trim();
+    
+    if (!id || !name) {
+        showToast('Please fill in all fields', 'error');
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        const newTeam = { id, name, scores: {} };
+        
+        if (db) {
+            // Use set with the team's ID as the document ID
+            await db.collection('teams').doc(id).set(newTeam);
+        } else {
+            // Check for duplicate ID in local data
+            if (localData.teams.some(t => t.id === id)) {
+                 showToast(`Team with ID ${id} already exists.`, 'error');
+                 hideLoading();
+                 return;
             }
-            
-            showLoading();
-            
-            for (const team of teams) {
-                if (!team.id || !team.name) {
-                    showToast('Invalid team format. Each team must have id and name.', 'error');
-                    continue;
-                }
-                
-                const newTeam = { id: team.id, name: team.name, scores: {} };
-                
-                if (db) {
-                    await db.collection('teams').doc(team.id).set(newTeam);
-                } else {
-                    const existingIndex = localData.teams.findIndex(t => t.id === team.id);
-                    if (existingIndex !== -1) {
-                        localData.teams[existingIndex] = newTeam;
-                    } else {
-                        localData.teams.push(newTeam);
-                    }
-                }
-            }
-            
-            await loadTeamsList();
-            showToast(`${teams.length} teams uploaded successfully`);
-        } catch (error) {
-            console.error('Error uploading teams:', error);
-            showToast('Error uploading teams. Please check the JSON format.', 'error');
+            localData.teams.push(newTeam);
         }
         
-        hideLoading();
-        e.target.value = '';
-    };
+        hideAddTeamModal();
+        await loadTeamsList();
+        showToast('Team added successfully');
+    } catch (error) {
+        console.error('Error adding team:', error);
+        showToast('Error adding team', 'error');
+    }
     
-    reader.readAsText(file);
+    hideLoading();
+}
+
+async function removeTeam(teamId, teamName) {
+    if (!confirm(`Are you sure you want to remove ${teamName}? This will also remove their scores.`)) return;
+    
+    showLoading();
+    
+    try {
+        if (db) {
+            await db.collection('teams').doc(teamId).delete();
+        } else {
+            localData.teams = localData.teams.filter(t => t.id !== teamId);
+        }
+        
+        await loadTeamsList();
+        showToast('Team removed successfully');
+    } catch (error) {
+        console.error('Error removing team:', error);
+        showToast('Error removing team', 'error');
+    }
+    
+    hideLoading();
 }
 
 // Leaderboard Functions
@@ -867,10 +912,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (addJudgeForm) {
             addJudgeForm.addEventListener('submit', handleAddJudge);
         }
-        
-        const teamFile = document.getElementById('team-file');
-        if (teamFile) {
-            teamFile.addEventListener('change', handleTeamUpload);
+
+        const addTeamForm = document.getElementById('add-team-form');
+        if (addTeamForm) {
+            addTeamForm.addEventListener('submit', handleAddTeam);
         }
         
         // Set up scoring input listeners for average calculation
@@ -887,6 +932,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (e.target.classList.contains('modal')) {
                 if (e.target.id === 'login-modal') hideLoginModal();
                 if (e.target.id === 'add-judge-modal') hideAddJudgeModal();
+                if (e.target.id === 'add-team-modal') hideAddTeamModal();
             }
         });
         
@@ -894,12 +940,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (e.key === 'Escape') {
                 const loginModal = document.getElementById('login-modal');
                 const addJudgeModal = document.getElementById('add-judge-modal');
+                const addTeamModal = document.getElementById('add-team-modal');
                 
                 if (loginModal && !loginModal.classList.contains('hidden')) {
                     hideLoginModal();
                 }
                 if (addJudgeModal && !addJudgeModal.classList.contains('hidden')) {
                     hideAddJudgeModal();
+                }
+                if (addTeamModal && !addTeamModal.classList.contains('hidden')) {
+                    hideAddTeamModal();
                 }
             }
         });
