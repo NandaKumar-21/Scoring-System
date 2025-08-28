@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Judging System</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Landing/Login Page -->
+        <div id="landing-page" class="page active">
+            <div class="login-container">
+                <div class="login-card">
+                    <h1>Judging System</h1>
+                    <p>Please select your login type</p>
+                    <div class="login-buttons">
+                        <button class="btn btn--primary btn--lg" onclick="showLoginModal('admin')">Admin Login</button>
+                        <button class="btn btn--secondary btn--lg" onclick="showLoginModal('judge')">Judge Login</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Judge Dashboard -->
+        <div id="judge-dashboard" class="page">
+            <div class="container">
+                <div class="dashboard-header">
+                    <div>
+                        <h1>Judge Dashboard</h1>
+                        <p>Welcome, <span id="judge-name">Judge</span></p>
+                    </div>
+                    <button class="btn btn--outline" onclick="logout()">Logout</button>
+                </div>
+                
+                <div class="teams-section">
+                    <h2>Teams</h2>
+                    <div id="teams-grid" class="teams-grid">
+                        <!-- Teams will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scoring Page -->
+        <div id="scoring-page" class="page">
+            <div class="container">
+                <div class="scoring-header">
+                    <button class="btn btn--outline" onclick="backToDashboard()">← Back to Dashboard</button>
+                    <h1>Score Team: <span id="scoring-team-name"></span></h1>
+                </div>
+
+                <div class="scoring-form-container">
+                    <form id="scoring-form" class="scoring-form">
+                        <div class="form-group">
+                            <label class="form-label">Uniqueness (out of 10)</label>
+                            <input type="number" class="form-control" id="uniqueness" min="0" max="10" step="0.1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Presentation (out of 10)</label>
+                            <input type="number" class="form-control" id="presentation" min="0" max="10" step="0.1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Working Model (out of 10)</label>
+                            <input type="number" class="form-control" id="workingModel" min="0" max="10" step="0.1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Impact & Future Scope (out of 10)</label>
+                            <input type="number" class="form-control" id="impactFuture" min="0" max="10" step="0.1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Scalability (out of 10)</label>
+                            <input type="number" class="form-control" id="scalability" min="0" max="10" step="0.1" required>
+                        </div>
+
+                        <div class="average-display">
+                            <strong>Average Score: <span id="average-score">0.00</span></strong>
+                        </div>
+
+                        <button type="submit" class="btn btn--primary btn--full-width">Submit Scores</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="admin-dashboard" class="page">
+            <div class="container">
+                <div class="dashboard-header">
+                    <div>
+                        <h1>Admin Dashboard</h1>
+                        <p>System Administration</p>
+                    </div>
+                    <button class="btn btn--outline" onclick="logout()">Logout</button>
+                </div>
+
+                <div class="admin-sections">
+                    <div class="admin-section">
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Judge Management</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="judge-actions">
+                                    <button class="btn btn--primary" onclick="showAddJudgeModal()">Add Judge</button>
+                                </div>
+                                <div id="judges-list" class="judges-list">
+                                    <!-- Judges will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-section">
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Team Management</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="team-actions">
+                                    <input type="file" id="team-file" accept=".json" class="hidden">
+                                    <button class="btn btn--primary" onclick="document.getElementById('team-file').click()">Upload Teams (JSON)</button>
+                                </div>
+                                <div id="teams-list" class="teams-list">
+                                    <!-- Teams will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-section">
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Leaderboard & Actions</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="leaderboard-actions">
+                                    <button class="btn btn--primary" onclick="showLeaderboard()">View Leaderboard</button>
+                                    <button class="btn btn--secondary" onclick="downloadLeaderboardCSV()">Download CSV</button>
+                                    <button class="btn btn--outline" style="color: #E74C3C; border-color: #E74C3C;" onclick="resetAllData()">Reset All Data</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Page -->
+        <div id="leaderboard-page" class="page">
+            <div class="container">
+                <div class="dashboard-header">
+                    <button class="btn btn--outline" onclick="backToAdmin()">← Back to Admin</button>
+                    <h1>Leaderboard</h1>
+                    <button class="btn btn--secondary" onclick="downloadLeaderboardCSV()">Download CSV</button>
+                </div>
+
+                <div id="leaderboard-table" class="leaderboard-table">
+                    <!-- Leaderboard will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="login-modal-title">Login</h3>
+                <button class="modal-close" onclick="hideLoginModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Judge Modal -->
+    <div id="add-judge-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Judge</h3>
+                <button class="modal-close" onclick="hideAddJudgeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-judge-form">
+                    <div class="form-group">
+                        <label class="form-label">Judge Name</label>
+                        <input type="text" class="form-control" id="judge-name-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="judge-password-input" required>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Add Judge</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Messages -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- App JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
