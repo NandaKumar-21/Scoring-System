@@ -14,12 +14,6 @@ window.backToAdmin = backToAdmin;
 window.backToDashboard = backToDashboard;
 window.logout = logout;
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDAYFBfgOTIEq4Jv2ZgXXcFouAXixp5i-Y",
   authDomain: "scoring-ce40d.firebaseapp.com",
@@ -29,9 +23,6 @@ const firebaseConfig = {
   appId: "1:1056263661432:web:885eec66405b21f9358a8d"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-// Global State
 let currentUser = null;
 let currentUserType = null;
 let currentTeam = null;
