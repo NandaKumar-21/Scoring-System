@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scoring System</title>
+    <title>Judging System</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="app">
-        <!-- Landing/Login Page -->
         <div id="landing-page" class="page active">
             <div class="login-container">
                 <div class="login-card">
-                    <h1>Scoring System</h1>
+                    <h1>Judging System</h1>
                     <p>Please select your login type</p>
                     <div class="login-buttons">
                         <button class="btn btn--primary btn--lg" onclick="showLoginModal('admin')">Admin Login</button>
@@ -23,7 +22,6 @@
             </div>
         </div>
 
-        <!-- Judge Dashboard -->
         <div id="judge-dashboard" class="page">
             <div class="container">
                 <div class="dashboard-header">
@@ -37,13 +35,11 @@
                 <div class="teams-section">
                     <h2>Teams</h2>
                     <div id="teams-grid" class="teams-grid">
-                        <!-- Teams will be loaded here -->
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
 
-        <!-- Scoring Page -->
         <div id="scoring-page" class="page">
             <div class="container">
                 <div class="scoring-header">
@@ -88,7 +84,6 @@
             </div>
         </div>
 
-        <!-- Admin Dashboard -->
         <div id="admin-dashboard" class="page">
             <div class="container">
                 <div class="dashboard-header">
@@ -110,8 +105,7 @@
                                     <button class="btn btn--primary" onclick="showAddJudgeModal()">Add Judge</button>
                                 </div>
                                 <div id="judges-list" class="judges-list">
-                                    <!-- Judges will be loaded here -->
-                                </div>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -123,12 +117,10 @@
                             </div>
                             <div class="card__body">
                                 <div class="team-actions">
-                                    <input type="file" id="team-file" accept=".json" class="hidden">
-                                    <button class="btn btn--primary" onclick="document.getElementById('team-file').click()">Upload Teams (JSON)</button>
+                                    <button class="btn btn--primary" onclick="showAddTeamModal()">Add Team</button>
                                 </div>
                                 <div id="teams-list" class="teams-list">
-                                    <!-- Teams will be loaded here -->
-                                </div>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -151,7 +143,6 @@
             </div>
         </div>
 
-        <!-- Leaderboard Page -->
         <div id="leaderboard-page" class="page">
             <div class="container">
                 <div class="dashboard-header">
@@ -161,13 +152,11 @@
                 </div>
 
                 <div id="leaderboard-table" class="leaderboard-table">
-                    <!-- Leaderboard will be loaded here -->
-                </div>
+                    </div>
             </div>
         </div>
     </div>
 
-    <!-- Login Modal -->
     <div id="login-modal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -186,7 +175,6 @@
         </div>
     </div>
 
-    <!-- Add Judge Modal -->
     <div id="add-judge-modal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -208,21 +196,39 @@
             </div>
         </div>
     </div>
+    
+    <div id="add-team-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Team</h3>
+                <button class="modal-close" onclick="hideAddTeamModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-team-form">
+                    <div class="form-group">
+                        <label class="form-label">Team ID</label>
+                        <input type="text" class="form-control" id="team-id-input" required placeholder="e.g., pe20298">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Team Name</label>
+                        <input type="text" class="form-control" id="team-name-input" required placeholder="e.g., Team Alpha">
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Add Team</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-    <!-- Loading Spinner -->
     <div id="loading" class="loading hidden">
         <div class="spinner"></div>
     </div>
 
-    <!-- Toast Messages -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
-    <!-- App JavaScript -->
     <script src="app.js"></script>
 </body>
 </html>
