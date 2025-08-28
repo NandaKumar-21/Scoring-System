@@ -14,17 +14,23 @@ window.backToAdmin = backToAdmin;
 window.backToDashboard = backToDashboard;
 window.logout = logout;
 
-// Firebase Configuration - Update these with your actual Firebase config
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-    // For demo purposes, we'll work with offline functionality first
-    apiKey: "demo-key",
-    authDomain: "demo-project.firebaseapp.com",
-    projectId: "demo-project-id",
-    storageBucket: "demo-project.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "demo-app-id"
+  apiKey: "AIzaSyDAYFBfgOTIEq4Jv2ZgXXcFouAXixp5i-Y",
+  authDomain: "scoring-ce40d.firebaseapp.com",
+  projectId: "scoring-ce40d",
+  storageBucket: "scoring-ce40d.firebasestorage.app",
+  messagingSenderId: "1056263661432",
+  appId: "1:1056263661432:web:885eec66405b21f9358a8d"
 };
 
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 // Global State
 let currentUser = null;
 let currentUserType = null;
